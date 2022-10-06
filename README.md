@@ -2,6 +2,7 @@
 
 - Java 18
 - mvn clean install && mvn compile exec:run
+- xelda -s {search term}
 
 ## Design
 
