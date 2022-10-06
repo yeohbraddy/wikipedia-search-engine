@@ -61,7 +61,7 @@ Finally, I ran into blockers trying to get the MongoDB repository implementation
 
 ### If More Time
 
-- Remove text-search and implement own text-search using something like KMP or Rabin Karp algorithm where we modify it slightly to return partial matches and we can rank it
+- Remove text-search and implement own text-search using something like KMP or Rabin Karp algorithm where we modify it slightly to return partial matches and we can rank it. The better alternative solution is to use tries, and iiterate over the large body of text once
 - Testing
 - Improve CLI (more arguments, more granular search, prettify the printing) / implement front-end
 - Dockerize solution
