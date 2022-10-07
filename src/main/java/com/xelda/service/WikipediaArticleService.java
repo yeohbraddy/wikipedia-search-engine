@@ -10,16 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.TextCriteria;
-import org.springframework.data.mongodb.core.query.TextQuery;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+
 @Service
 public class WikipediaArticleService {
     private static final Logger LOG = LoggerFactory.getLogger(WikipediaArticleService.class);
@@ -34,10 +36,18 @@ public class WikipediaArticleService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private IndexService indexService;
     public List<Page> search(String query) {
-        TextCriteria c = TextCriteria.forDefaultLanguage().matching(query);
-        Query q = TextQuery.queryText(c).sortByScore();
-        List<Page> pages = this.mongoTemplate.find(q, Page.class);
+        List<Page> pages = new ArrayList<>();
+
+        Set<Integer> pageIds = this.indexService.search(query);
+        if (pageIds.size() != 0) {
+            for (Integer id : pageIds) {
+                pages.add(this.mongoTemplate.findById(id, Page.class));
+            }
+        }
 
         return pages;
     }
@@ -51,6 +61,16 @@ public class WikipediaArticleService {
         LOG.info("RestTemplate finished exchanging");
 
         Root root = new Gson().fromJson(response, Root.class);
+        for (Page p : root.getQuery().getPages().values()) {
+            for (String s : p.getTitle().split(" ")) {
+                this.indexService.insert(s, p.getPageid());
+            }
+
+            for (String s : p.getExtract().split(" ")) {
+                this.indexService.insert(s, p.getPageid());
+            }
+        }
+
         this.mongoTemplate.insertAll(root.getQuery().getPages().values());
     }
 

@@ -24,12 +24,17 @@ public class SearchService {
     @ShellMethod(key = commandKey, value = "search query")
     public void search(@ShellOption(value = "-s") @Size(min = 1) String query) {
         LOG.info("Searching for: " + query);
+
         List<Page> res = this.wikipediaArticleService.search(query);
 
+        if (res.size() == 0) {
+            LOG.info("No results");
+        }
+
         for (Page p : res) {
-            LOG.info("\n =================================================\n" +
+            LOG.info("\n\n=================================================\n" +
                     p.toString() +
-                    "\n =================================================\n" );
+                    "\n=================================================\n" );
         }
     }
 }
