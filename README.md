@@ -62,6 +62,7 @@ Finally, I ran into blockers trying to get the MongoDB repository implementation
 - No tests
 - Would be nice to include link to the article in the CLI after searching
 - Since we split it via strings, searching for more than one word results in duplication of searches, e.g title = "I like food", pageId = 123 = node("I", 123), node("like", 123), node("food", 123) hence the usage of a set to prevent returning 3 of the same articles
+- Uses trie instead of tf-idf, and no lemming, removing stop-words, etc.
 
 ### If More Time
 
